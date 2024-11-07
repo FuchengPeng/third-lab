@@ -33,11 +33,35 @@
             from { opacity: 0; }
             to { opacity: 1; }
         }
+        .chest {
+            display: inline-block;
+            margin: 10px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        .chest:hover {
+            transform: scale(1.1);
+        }
+        .chest img {
+            width: 100px;
+        }
     </style>
 </head>
 <body>
     <h1>欢迎来到寻宝游戏!</h1>
     <div id="message">准备开始...</div>
+    <div id="chest-container" style="display:none;">
+        <h2>选择一个宝箱:</h2>
+        <div class="chest" onclick="selectChest(1)">
+            <img src="chest.png" alt="宝箱1" id="chest1">
+        </div>
+        <div class="chest" onclick="selectChest(2)">
+            <img src="chest.png" alt="宝箱2" id="chest2">
+        </div>
+        <div class="chest" onclick="selectChest(3)">
+            <img src="chest.png" alt="宝箱3" id="chest3">
+        </div>
+    </div>
     <script>
         class TreasureMap {
             static getInitialClue() {
@@ -95,6 +119,9 @@
                 let treasure = await TreasureMap.openTreasureBox();
                 displayMessage(treasure);
 
+                // 显示宝箱选择
+                document.getElementById('chest-container').style.display = 'block';
+
             } catch (error) {
                 displayMessage("任务失败: " + error);
             }
@@ -102,9 +129,28 @@
 
         function displayMessage(message) {
             const messageElement = document.getElementById('message');
-            messageElement.textContent += '\n' + message;
+            const icon = '🔍'; // 使用一个简单的图标（可以替换为图像）
+            messageElement.textContent += '\n' + icon + ' ' + message;
             messageElement.classList.add('fade-in'); // 添加淡入效果
             setTimeout(() => messageElement.classList.remove('fade-in'), 500); // 移除类以便下次使用
+        }
+
+        function selectChest(chestNumber) {
+            const correctChests = [1, 2]; // 假设宝箱1和宝箱2是正确的
+            const chestImages = {
+                1: ['chest.png', 'treasure.png'], // 宝箱1的图片和打开后的图片
+                2: ['chest.png', 'treasure.png'], // 宝箱2的图片和打开后的图片
+                3: ['chest.png', 'empty.png'] // 宝箱3的图片和打开后的图片（空的）
+            };
+
+            const chestImage = document.getElementById(`chest${chestNumber}`);
+            chestImage.src = chestImages[chestNumber][1]; // 改变为打开后的图片
+
+            if (correctChests.includes(chestNumber)) {
+                alert("恭喜你！你选择了正确的宝箱！");
+            } else {
+                alert("很遗憾，你选择了错误的宝箱。");
+            }
         }
 
         findTreasureWithAsyncAwait();
