@@ -53,13 +53,13 @@
     <div id="chest-container" style="display:none;">
         <h2>选择一个宝箱:</h2>
         <div class="chest" onclick="selectChest(1)">
-            <img src="chest1.png" alt="宝箱1" id="chest1">
+            <img src="chest.png" alt="宝箱1" id="chest1">
         </div>
         <div class="chest" onclick="selectChest(2)">
-            <img src="chest2.png" alt="宝箱2" id="chest2">
+            <img src="chest.png" alt="宝箱2" id="chest2">
         </div>
         <div class="chest" onclick="selectChest(3)">
-            <img src="chest3.png" alt="宝箱3" id="chest3">
+            <img src="chest.png" alt="宝箱3" id="chest3">
         </div>
     </div>
     <script>
@@ -138,9 +138,9 @@
         function selectChest(chestNumber) {
             const correctChests = [1, 2]; // 假设宝箱1和宝箱2是正确的
             const chestImages = {
-                1: ['chest1.png', 'treasure1.png'], // 宝箱1的图片和打开后的图片
-                2: ['chest2.png', 'treasure2.png'], // 宝箱2的图片和打开后的图片
-                3: ['chest3.png', 'empty.png'] // 宝箱3的图片和打开后的图片（空的）
+                1: ['chest.png', 'treasure.png'], // 宝箱1的图片和打开后的图片
+                2: ['chest.png', 'treasure.png'], // 宝箱2的图片和打开后的图片
+                3: ['chest.png', 'empty.png'] // 宝箱3的图片和打开后的图片（空的）
             };
 
             const chestImage = document.getElementById(`chest${chestNumber}`);
