@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>寻宝游戏</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            text-align: center;
+            padding: 50px;
+        }
+        #message {
+            font-size: 24px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>欢迎来到寻宝游戏!</h1>
+    <div id="message">准备开始...</div>
+    <script>
+        class TreasureMap {
+            static getInitialClue() {
+                return new Promise((resolve) => {
+                    setTimeout(() => {
+                        resolve("在古老的图书馆里找到了一个神秘的书籍...");
+                    }, 1000);
+                });
+            }
+
+            static decodeAncientScript(clue) {
+                return new Promise((resolve, reject) => {
+                    setTimeout(() => {
+                        if (!clue) {
+                            reject("没有线索可以解码!");
+                        }
+                        resolve("解码成功! 你发现了一个古老的咒语...");
+                    }, 1500);
+                });
+            }
+
+            static searchTemple(location) {
+                return new Promise((resolve, reject) => {
+                    setTimeout(() => {
+                        const random = Math.random();
+                        if (random < 0.5) {
+                            reject("糟糕! 遇到了神庙的守护者! 你需要回答一个问题才能继续...");
+                        }
+                        resolve("找到了一个神秘的箱子...");
+                    }, 2000);
+                });
+            }
+
+            static openTreasureBox() {
+                return new Promise((resolve) => {
+                    setTimeout(() => {
+                        resolve("恭喜! 你找到了传说中的宝藏和一个神秘的卷轴!");
+                    }, 1000);
+                });
+            }
+        }
+
+        async function findTreasureWithAsyncAwait() {
+            const messageElement = document.getElementById('message');
+            try {
+                let clue = await TreasureMap.getInitialClue();
+                messageElement.textContent = clue;
+
+                let script = await TreasureMap.decodeAncientScript(clue);
+                messageElement.textContent = script;
+
+                let box = await TreasureMap.searchTemple(script);
+                messageElement.textContent = box;
+
+                let treasure = await TreasureMap.openTreasureBox();
+                messageElement.textContent = treasure;
+
+            } catch (error) {
+                messageElement.textContent = "任务失败: " + error;
+            }
+        }
+
+        findTreasureWithAsyncAwait();
+    </script>
+</body>
+</html>
