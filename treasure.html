@@ -6,14 +6,32 @@
     <title>寻宝游戏</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(to bottom right, #87CEFA, #4682B4);
             text-align: center;
             padding: 50px;
+            color: #fff;
+        }
+        h1 {
+            font-size: 36px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
         }
         #message {
             font-size: 24px;
             margin: 20px 0;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 2px solid #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            white-space: pre-wrap; /* 保持换行 */
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
     </style>
 </head>
@@ -66,20 +84,27 @@
             const messageElement = document.getElementById('message');
             try {
                 let clue = await TreasureMap.getInitialClue();
-                messageElement.textContent = clue;
+                displayMessage(clue);
 
                 let script = await TreasureMap.decodeAncientScript(clue);
-                messageElement.textContent = script;
+                displayMessage(script);
 
                 let box = await TreasureMap.searchTemple(script);
-                messageElement.textContent = box;
+                displayMessage(box);
 
                 let treasure = await TreasureMap.openTreasureBox();
-                messageElement.textContent = treasure;
+                displayMessage(treasure);
 
             } catch (error) {
-                messageElement.textContent = "任务失败: " + error;
+                displayMessage("任务失败: " + error);
             }
+        }
+
+        function displayMessage(message) {
+            const messageElement = document.getElementById('message');
+            messageElement.textContent += '\n' + message;
+            messageElement.classList.add('fade-in'); // 添加淡入效果
+            setTimeout(() => messageElement.classList.remove('fade-in'), 500); // 移除类以便下次使用
         }
 
         findTreasureWithAsyncAwait();
