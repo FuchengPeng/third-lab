@@ -9,6 +9,7 @@
             font-family: Arial, sans-serif;
             text-align: center;
             background-color: #f0f8ff;
+            overflow: hidden;
         }
         .game-card {
             display: inline-block;
@@ -17,13 +18,39 @@
             background-color: #87cefa;
             border-radius: 10px;
             cursor: pointer;
-            transition: transform 0.3s;
+            transition: transform 0.3s, all 0.5s;
+            position: relative;
         }
         .game-card:hover {
             transform: scale(1.1);
         }
+        #game-selection {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .game-card:nth-child(2) {
+            transform: rotate(0deg);
+            z-index: 2;
+        }
+        .game-card:nth-child(1) {
+            transform: rotate(-15deg);
+            z-index: 1;
+        }
+        .game-card:nth-child(3) {
+            transform: rotate(15deg);
+            z-index: 1;
+        }
+        .selected {
+            transform: rotate(0deg) scale(1.2) !important;
+            z-index: 3 !important;
+        }
         #chest-container {
             margin-top: 20px;
+            display: none;
         }
         .chest {
             display: inline-block;
@@ -38,19 +65,19 @@
 <body>
     <h1>欢迎来到寻宝游戏!</h1>
     <div id="game-selection">
-        <h2>选择一个游戏:</h2>
         <div class="game-card" onclick="selectGame('game1')">冒险任务</div>
         <div class="game-card" onclick="selectGame('game2')">拼图大师</div>
+        <div class="game-card" onclick="selectGame('game3')">智慧挑战</div>
     </div>
     <div id="message">准备开始...</div>
-    <div id="chest-container" style="display:none;">
+    <div id="chest-container">
         <h2>选择一个宝箱:</h2>
-        <div class="chest" onclick="selectChest(1)"><img src="chest.png" alt="宝箱1"></div>
-        <div class="chest" onclick="selectChest(2)"><img src="chest.png" alt="宝箱2"></div>
-        <div class="chest" onclick="selectChest(3)"><img src="chest.png" alt="宝箱3"></div>
+        <div class="chest" onclick="selectChest(1)"><img src="chest.png" alt="宝箱1" id="chest1"></div>
+        <div class="chest" onclick="selectChest(2)"><img src="chest.png" alt="宝箱2" id="chest2"></div>
+        <div class="chest" onclick="selectChest(3)"><img src="chest.png" alt="宝箱3" id="chest3"></div>
     </div>
     <script>
-        const playerData = {
+        const defaultPlayerData = {
             playerId: "12345",
             nickname: "PlayerOne",
             games: [
@@ -69,13 +96,21 @@
                         level: 0,
                         score: 0
                     }
+                },
+                {
+                    gameId: "game3",
+                    name: "智慧挑战",
+                    history: {
+                        level: 0,
+                        score: 0
+                    }
                 }
             ]
         };
 
         function loadPlayerData() {
             const data = localStorage.getItem('playerData');
-            return data ? JSON.parse(data) : playerData;
+            return data ? JSON.parse(data) : defaultPlayerData;
         }
 
         function savePlayerData(data) {
@@ -86,6 +121,9 @@
             const data = loadPlayerData();
             const game = data.games.find(g => g.gameId === gameId);
             if (game) {
+                document.querySelectorAll('.game-card').forEach(card => card.classList.remove('selected'));
+                const selectedCard = document.querySelector(`.game-card:nth-child(${gameId.slice(-1)})`);
+                selectedCard.classList.add('selected');
                 startGame(game);
             }
         }
@@ -97,9 +135,17 @@
         }
 
         function selectChest(chestNumber) {
-            const message = chestNumber === 1 ? "恭喜你！你找到了宝藏！" : "很遗憾，宝箱是空的。";
-            alert(message);
-            updateGameHistory('game1', 1, chestNumber === 1 ? 100 : 0);
+            const correctChest = 1; // 假设正确的宝箱是1号
+            const chestElement = document.getElementById(`chest${chestNumber}`);
+            if (chestNumber === correctChest) {
+                alert("恭喜你！你找到了宝藏！");
+                chestElement.src = "correct_chest.png"; // 正确宝箱的图片
+                updateGameHistory('game1', 1, 100);
+            } else {
+                alert("很遗憾，宝箱是空的。");
+                chestElement.src = "empty_chest.png"; // 空宝箱的图片
+                updateGameHistory('game1', 1, 0);
+            }
         }
 
         function updateGameHistory(gameId, level, score) {
@@ -112,8 +158,10 @@
             }
         }
 
-        // 初始加载
-        loadPlayerData();
+        document.addEventListener('DOMContentLoaded', () => {
+            const playerData = loadPlayerData();
+            console.log("玩家数据已加载:", playerData);
+        });
     </script>
 </body>
 </html>
