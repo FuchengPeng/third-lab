@@ -139,11 +139,11 @@
             const chestElement = document.getElementById(`chest${chestNumber}`);
             if (chestNumber === correctChest) {
                 alert("恭喜你！你找到了宝藏！");
-                chestElement.src = "correct_chest.png"; // 正确宝箱的图片
+                chestElement.src = "treasure.png"; // 正确宝箱的图片
                 updateGameHistory('game1', 1, 100);
             } else {
                 alert("很遗憾，宝箱是空的。");
-                chestElement.src = "empty_chest.png"; // 空宝箱的图片
+                chestElement.src = "empty.png"; // 空宝箱的图片
                 updateGameHistory('game1', 1, 0);
             }
         }
