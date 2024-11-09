@@ -24,7 +24,14 @@
             border: 2px solid #fff;
             border-radius: 10px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-            white-space: pre-wrap; /* 保持换行 */
+            white-space: pre-wrap;
+        }
+        #element-info {
+            margin-top: 20px;
+            font-size: 18px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 10px;
         }
         .fade-in {
             animation: fadeIn 0.5s ease-in-out;
@@ -50,19 +57,33 @@
 <body>
     <h1>欢迎来到寻宝游戏!</h1>
     <div id="message">准备开始...</div>
+    <div id="element-info"></div>
     <div id="chest-container" style="display:none;">
         <h2>选择一个宝箱:</h2>
         <div class="chest" onclick="selectChest(1)">
-            <img src="chest.png" alt="宝箱1" id="chest">
+            <img src="chest.png" alt="宝箱1" id="chest1">
         </div>
         <div class="chest" onclick="selectChest(2)">
-            <img src="chest.png" alt="宝箱2" id="chest">
+            <img src="chest.png" alt="宝箱2" id="chest2">
         </div>
         <div class="chest" onclick="selectChest(3)">
-            <img src="chest.png" alt="宝箱3" id="chest">
+            <img src="chest.png" alt="宝箱3" id="chest3">
         </div>
     </div>
     <script>
+        async function loadElementInfo() {
+            try {
+                const response = await fetch('elements.txt');
+                if (!response.ok) {
+                    throw new Error('网络响应不正常');
+                }
+                const data = await response.text();
+                document.getElementById('element-info').textContent = data;
+            } catch (error) {
+                console.error('获取元素信息时出错:', error);
+            }
+        }
+
         class TreasureMap {
             static getInitialClue() {
                 return new Promise((resolve) => {
@@ -105,6 +126,7 @@
         }
 
         async function findTreasureWithAsyncAwait() {
+            await loadElementInfo(); // 先加载元素信息
             const messageElement = document.getElementById('message');
             try {
                 let clue = await TreasureMap.getInitialClue();
@@ -129,22 +151,22 @@
 
         function displayMessage(message) {
             const messageElement = document.getElementById('message');
-            const icon = '🔍'; // 使用一个简单的图标（可以替换为图像）
+            const icon = '🔍';
             messageElement.textContent += '\n' + icon + ' ' + message;
-            messageElement.classList.add('fade-in'); // 添加淡入效果
-            setTimeout(() => messageElement.classList.remove('fade-in'), 500); // 移除类以便下次使用
+            messageElement.classList.add('fade-in');
+            setTimeout(() => messageElement.classList.remove('fade-in'), 500);
         }
 
         function selectChest(chestNumber) {
-            const correctChests = [1, 2]; // 假设宝箱1和宝箱2是正确的
+            const correctChests = [1, 2];
             const chestImages = {
-                1: ['chest.png', 'treasure.png'], // 宝箱1的图片和打开后的图片
-                2: ['chest.png', 'treasure.png'], // 宝箱2的图片和打开后的图片
-                3: ['chest.png', 'empty.png'] // 宝箱3的图片和打开后的图片（空的）
+                1: ['chest.png', 'treasure.png'],
+                2: ['chest.png', 'treasure.png'],
+                3: ['chest.png', 'empty.png']
             };
 
             const chestImage = document.getElementById(`chest${chestNumber}`);
-            chestImage.src = chestImages[chestNumber][1]; // 改变为打开后的图片
+            chestImage.src = chestImages[chestNumber][1];
 
             if (correctChests.includes(chestNumber)) {
                 alert("恭喜你！你选择了正确的宝箱！");
