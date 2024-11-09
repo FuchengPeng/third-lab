@@ -6,29 +6,62 @@
     <title>寻宝游戏</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-image: url('background.jpg'); /* 预留背景照片 */
-            background-size: cover;
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(to bottom right, #87CEFA, #4682B4);
             text-align: center;
             padding: 50px;
-            color: white;
+            color: #fff;
+        }
+        h1 {
+            font-size: 36px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
         }
         #message {
             font-size: 24px;
             margin: 20px 0;
-            opacity: 0;
-            transition: opacity 1s;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 2px solid #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            white-space: pre-wrap; /* 保持换行 */
         }
-        #treasure {
-            display: none;
-            margin-top: 20px;
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .chest {
+            display: inline-block;
+            margin: 10px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        .chest:hover {
+            transform: scale(1.1);
+        }
+        .chest img {
+            width: 100px;
         }
     </style>
 </head>
 <body>
     <h1>欢迎来到寻宝游戏!</h1>
     <div id="message">准备开始...</div>
-    <img id="treasure" src="treasure.jpg" alt="宝藏" width="300"> <!-- 宝箱的照片 -->
+    <div id="chest-container" style="display:none;">
+        <h2>选择一个宝箱:</h2>
+        <div class="chest" onclick="selectChest(1)">
+            <img src="chest.png" alt="宝箱1" id="chest">
+        </div>
+        <div class="chest" onclick="selectChest(2)">
+            <img src="chest.png" alt="宝箱2" id="chest">
+        </div>
+        <div class="chest" onclick="selectChest(3)">
+            <img src="chest.png" alt="宝箱3" id="chest">
+        </div>
+    </div>
     <script>
         class TreasureMap {
             static getInitialClue() {
@@ -73,37 +106,51 @@
 
         async function findTreasureWithAsyncAwait() {
             const messageElement = document.getElementById('message');
-            const treasureElement = document.getElementById('treasure');
             try {
                 let clue = await TreasureMap.getInitialClue();
-                await displayMessage(clue);
+                displayMessage(clue);
 
                 let script = await TreasureMap.decodeAncientScript(clue);
-                await displayMessage(script);
+                displayMessage(script);
 
                 let box = await TreasureMap.searchTemple(script);
-                await displayMessage(box);
+                displayMessage(box);
 
                 let treasure = await TreasureMap.openTreasureBox();
-                await displayMessage(treasure);
+                displayMessage(treasure);
 
-                treasureElement.style.display = 'block'; // 显示宝箱图片
+                // 显示宝箱选择
+                document.getElementById('chest-container').style.display = 'block';
 
             } catch (error) {
-                await displayMessage("任务失败: " + error);
+                displayMessage("任务失败: " + error);
             }
         }
 
-        function displayMessage(text) {
-            return new Promise((resolve) => {
-                const messageElement = document.getElementById('message');
-                messageElement.textContent = text;
-                messageElement.style.opacity = 1;
-                setTimeout(() => {
-                    messageElement.style.opacity = 0;
-                    setTimeout(resolve, 1000); // 等待过渡结束
-                }, 2000);
-            });
+        function displayMessage(message) {
+            const messageElement = document.getElementById('message');
+            const icon = '🔍'; // 使用一个简单的图标（可以替换为图像）
+            messageElement.textContent += '\n' + icon + ' ' + message;
+            messageElement.classList.add('fade-in'); // 添加淡入效果
+            setTimeout(() => messageElement.classList.remove('fade-in'), 500); // 移除类以便下次使用
+        }
+
+        function selectChest(chestNumber) {
+            const correctChests = [1, 2]; // 假设宝箱1和宝箱2是正确的
+            const chestImages = {
+                1: ['chest.png', 'treasure.png'], // 宝箱1的图片和打开后的图片
+                2: ['chest.png', 'treasure.png'], // 宝箱2的图片和打开后的图片
+                3: ['chest.png', 'empty.png'] // 宝箱3的图片和打开后的图片（空的）
+            };
+
+            const chestImage = document.getElementById(`chest${chestNumber}`);
+            chestImage.src = chestImages[chestNumber][1]; // 改变为打开后的图片
+
+            if (correctChests.includes(chestNumber)) {
+                alert("恭喜你！你选择了正确的宝箱！");
+            } else {
+                alert("很遗憾，你选择了错误的宝箱。");
+            }
         }
 
         findTreasureWithAsyncAwait();
