@@ -3,20 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>寻宝游戏</title>
+    <title>修仙游戏</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             text-align: center;
-            background-color: #f0f8ff;
+            background-color: #e0f7fa;
             overflow: hidden;
+            margin: 0;
+            padding: 0;
         }
         .game-card {
             display: inline-block;
-            margin: 10px;
-            padding: 20px;
-            background-color: #87cefa;
-            border-radius: 10px;
+            margin: 20px;
+            padding: 30px;
+            background-color: #b3e5fc;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             cursor: pointer;
             transition: transform 0.3s, all 0.5s;
             position: relative;
@@ -27,7 +30,7 @@
         #game-selection {
             position: relative;
             width: 100%;
-            height: 300px;
+            height: 400px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -48,33 +51,28 @@
             transform: rotate(0deg) scale(1.2) !important;
             z-index: 3 !important;
         }
-        #chest-container {
+        #message {
+            margin-top: 20px;
+            font-size: 1.2em;
+            color: #00796b;
+        }
+        #cultivation-container {
             margin-top: 20px;
             display: none;
-        }
-        .chest {
-            display: inline-block;
-            margin: 10px;
-            cursor: pointer;
-        }
-        .chest img {
-            width: 100px;
         }
     </style>
 </head>
 <body>
-    <h1>欢迎来到寻宝游戏!</h1>
+    <h1>欢迎来到修仙游戏!</h1>
     <div id="game-selection">
-        <div class="game-card" onclick="selectGame('game1')">冒险任务</div>
-        <div class="game-card" onclick="selectGame('game2')">拼图大师</div>
-        <div class="game-card" onclick="selectGame('game3')">智慧挑战</div>
+        <div class="game-card" onclick="selectGame('game1')">炼丹术</div>
+        <div class="game-card" onclick="selectGame('game2')">御剑术</div>
+        <div class="game-card" onclick="selectGame('game3')">符咒术</div>
     </div>
-    <div id="message">准备开始...</div>
-    <div id="chest-container">
-        <h2>选择一个宝箱:</h2>
-        <div class="chest" onclick="selectChest(1)"><img src="chest.png" alt="宝箱1" id="chest1"></div>
-        <div class="chest" onclick="selectChest(2)"><img src="chest.png" alt="宝箱2" id="chest2"></div>
-        <div class="chest" onclick="selectChest(3)"><img src="chest.png" alt="宝箱3" id="chest3"></div>
+    <div id="message">准备开始修仙...</div>
+    <div id="cultivation-container">
+        <h2>修炼中...</h2>
+        <p id="cultivation-progress"></p>
     </div>
     <script>
         const defaultPlayerData = {
@@ -83,26 +81,26 @@
             games: [
                 {
                     gameId: "game1",
-                    name: "冒险任务",
+                    name: "炼丹术",
                     history: {
                         level: 0,
-                        score: 0
+                        progress: "初学乍练"
                     }
                 },
                 {
                     gameId: "game2",
-                    name: "拼图大师",
+                    name: "御剑术",
                     history: {
                         level: 0,
-                        score: 0
+                        progress: "初学乍练"
                     }
                 },
                 {
                     gameId: "game3",
-                    name: "智慧挑战",
+                    name: "符咒术",
                     history: {
                         level: 0,
-                        score: 0
+                        progress: "初学乍练"
                     }
                 }
             ]
@@ -124,36 +122,31 @@
                 document.querySelectorAll('.game-card').forEach(card => card.classList.remove('selected'));
                 const selectedCard = document.querySelector(`.game-card:nth-child(${gameId.slice(-1)})`);
                 selectedCard.classList.add('selected');
-                startGame(game);
+                startCultivation(game);
             }
         }
 
-        function startGame(game) {
-            document.getElementById('message').textContent = `开始游戏: ${game.name}`;
-            document.getElementById('message').textContent += `\n进度: 等级 ${game.history.level}, 分数 ${game.history.score}`;
-            document.getElementById('chest-container').style.display = 'block';
+        function startCultivation(game) {
+            document.getElementById('message').textContent = `开始修炼: ${game.name}`;
+            document.getElementById('cultivation-container').style.display = 'block';
+            document.getElementById('cultivation-progress').textContent = `当前进度: ${game.history.progress}`;
+            simulateCultivation(game);
         }
 
-        function selectChest(chestNumber) {
-            const correctChest = 1; // 假设正确的宝箱是1号
-            const chestElement = document.getElementById(`chest${chestNumber}`);
-            if (chestNumber === correctChest) {
-                alert("恭喜你！你找到了宝藏！");
-                chestElement.src = "treasure.png"; // 正确宝箱的图片
-                updateGameHistory('game1', 1, 100);
-            } else {
-                alert("很遗憾，宝箱是空的。");
-                chestElement.src = "empty.png"; // 空宝箱的图片
-                updateGameHistory('game1', 1, 0);
-            }
+        function simulateCultivation(game) {
+            setTimeout(() => {
+                const newProgress = "成功突破";
+                document.getElementById('cultivation-progress').textContent = `当前进度: ${newProgress}`;
+                updateGameHistory(game.gameId, game.history.level + 1, newProgress);
+            }, 3000);
         }
 
-        function updateGameHistory(gameId, level, score) {
+        function updateGameHistory(gameId, level, progress) {
             const data = loadPlayerData();
             const game = data.games.find(g => g.gameId === gameId);
             if (game) {
                 game.history.level = level;
-                game.history.score = score;
+                game.history.progress = progress;
                 savePlayerData(data);
             }
         }
