@@ -6,48 +6,29 @@
     <title>寻宝游戏</title>
     <style>
         body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(to bottom right, #87CEFA, #4682B4);
+            font-family: Arial, sans-serif;
             text-align: center;
-            padding: 50px;
-            color: #fff;
+            background-color: #f0f8ff;
         }
-        h1 {
-            font-size: 36px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-        }
-        #message {
-            font-size: 24px;
-            margin: 20px 0;
+        .game-card {
+            display: inline-block;
+            margin: 10px;
             padding: 20px;
-            background-color: rgba(255, 255, 255, 0.1);
-            border: 2px solid #fff;
+            background-color: #87cefa;
             border-radius: 10px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-            white-space: pre-wrap;
+            cursor: pointer;
+            transition: transform 0.3s;
         }
-        #element-info {
+        .game-card:hover {
+            transform: scale(1.1);
+        }
+        #chest-container {
             margin-top: 20px;
-            font-size: 18px;
-            background-color: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            padding: 10px;
-        }
-        .fade-in {
-            animation: fadeIn 0.5s ease-in-out;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
         }
         .chest {
             display: inline-block;
             margin: 10px;
             cursor: pointer;
-            transition: transform 0.3s;
-        }
-        .chest:hover {
-            transform: scale(1.1);
         }
         .chest img {
             width: 100px;
@@ -56,126 +37,83 @@
 </head>
 <body>
     <h1>欢迎来到寻宝游戏!</h1>
+    <div id="game-selection">
+        <h2>选择一个游戏:</h2>
+        <div class="game-card" onclick="selectGame('game1')">冒险任务</div>
+        <div class="game-card" onclick="selectGame('game2')">拼图大师</div>
+    </div>
     <div id="message">准备开始...</div>
-    <div id="element-info"></div>
     <div id="chest-container" style="display:none;">
         <h2>选择一个宝箱:</h2>
-        <div class="chest" onclick="selectChest(1)">
-            <img src="chest.png" alt="宝箱1" id="chest1">
-        </div>
-        <div class="chest" onclick="selectChest(2)">
-            <img src="chest.png" alt="宝箱2" id="chest2">
-        </div>
-        <div class="chest" onclick="selectChest(3)">
-            <img src="chest.png" alt="宝箱3" id="chest3">
-        </div>
+        <div class="chest" onclick="selectChest(1)"><img src="chest.png" alt="宝箱1"></div>
+        <div class="chest" onclick="selectChest(2)"><img src="chest.png" alt="宝箱2"></div>
+        <div class="chest" onclick="selectChest(3)"><img src="chest.png" alt="宝箱3"></div>
     </div>
     <script>
-        async function loadElementInfo() {
-            try {
-                const response = await fetch('elements.txt');
-                if (!response.ok) {
-                    throw new Error('网络响应不正常');
+        const playerData = {
+            playerId: "12345",
+            nickname: "PlayerOne",
+            games: [
+                {
+                    gameId: "game1",
+                    name: "冒险任务",
+                    history: {
+                        level: 0,
+                        score: 0
+                    }
+                },
+                {
+                    gameId: "game2",
+                    name: "拼图大师",
+                    history: {
+                        level: 0,
+                        score: 0
+                    }
                 }
-                const data = await response.text();
-                document.getElementById('element-info').textContent = data;
-            } catch (error) {
-                console.error('获取元素信息时出错:', error);
+            ]
+        };
+
+        function loadPlayerData() {
+            const data = localStorage.getItem('playerData');
+            return data ? JSON.parse(data) : playerData;
+        }
+
+        function savePlayerData(data) {
+            localStorage.setItem('playerData', JSON.stringify(data));
+        }
+
+        function selectGame(gameId) {
+            const data = loadPlayerData();
+            const game = data.games.find(g => g.gameId === gameId);
+            if (game) {
+                startGame(game);
             }
         }
 
-        class TreasureMap {
-            static getInitialClue() {
-                return new Promise((resolve) => {
-                    setTimeout(() => {
-                        resolve("在古老的图书馆里找到了一个神秘的书籍...");
-                    }, 1000);
-                });
-            }
-
-            static decodeAncientScript(clue) {
-                return new Promise((resolve, reject) => {
-                    setTimeout(() => {
-                        if (!clue) {
-                            reject("没有线索可以解码!");
-                        }
-                        resolve("解码成功! 你发现了一个古老的咒语...");
-                    }, 1500);
-                });
-            }
-
-            static searchTemple(location) {
-                return new Promise((resolve, reject) => {
-                    setTimeout(() => {
-                        const random = Math.random();
-                        if (random < 0.5) {
-                            reject("糟糕! 遇到了神庙的守护者! 你需要回答一个问题才能继续...");
-                        }
-                        resolve("找到了一个神秘的箱子...");
-                    }, 2000);
-                });
-            }
-
-            static openTreasureBox() {
-                return new Promise((resolve) => {
-                    setTimeout(() => {
-                        resolve("恭喜! 你找到了传说中的宝藏和一个神秘的卷轴!");
-                    }, 1000);
-                });
-            }
-        }
-
-        async function findTreasureWithAsyncAwait() {
-            await loadElementInfo(); // 先加载元素信息
-            const messageElement = document.getElementById('message');
-            try {
-                let clue = await TreasureMap.getInitialClue();
-                displayMessage(clue);
-
-                let script = await TreasureMap.decodeAncientScript(clue);
-                displayMessage(script);
-
-                let box = await TreasureMap.searchTemple(script);
-                displayMessage(box);
-
-                let treasure = await TreasureMap.openTreasureBox();
-                displayMessage(treasure);
-
-                // 显示宝箱选择
-                document.getElementById('chest-container').style.display = 'block';
-
-            } catch (error) {
-                displayMessage("任务失败: " + error);
-            }
-        }
-
-        function displayMessage(message) {
-            const messageElement = document.getElementById('message');
-            const icon = '🔍';
-            messageElement.textContent += '\n' + icon + ' ' + message;
-            messageElement.classList.add('fade-in');
-            setTimeout(() => messageElement.classList.remove('fade-in'), 500);
+        function startGame(game) {
+            document.getElementById('message').textContent = `开始游戏: ${game.name}`;
+            document.getElementById('message').textContent += `\n进度: 等级 ${game.history.level}, 分数 ${game.history.score}`;
+            document.getElementById('chest-container').style.display = 'block';
         }
 
         function selectChest(chestNumber) {
-            const correctChests = [1, 2];
-            const chestImages = {
-                1: ['chest.png', 'treasure.png'],
-                2: ['chest.png', 'treasure.png'],
-                3: ['chest.png', 'empty.png']
-            };
+            const message = chestNumber === 1 ? "恭喜你！你找到了宝藏！" : "很遗憾，宝箱是空的。";
+            alert(message);
+            updateGameHistory('game1', 1, chestNumber === 1 ? 100 : 0);
+        }
 
-            const chestImage = document.getElementById(`chest${chestNumber}`);
-            chestImage.src = chestImages[chestNumber][1];
-
-            if (correctChests.includes(chestNumber)) {
-                alert("恭喜你！你选择了正确的宝箱！");
-            } else {
-                alert("很遗憾，你选择了错误的宝箱。");
+        function updateGameHistory(gameId, level, score) {
+            const data = loadPlayerData();
+            const game = data.games.find(g => g.gameId === gameId);
+            if (game) {
+                game.history.level = level;
+                game.history.score = score;
+                savePlayerData(data);
             }
         }
 
-        findTreasureWithAsyncAwait();
+        // 初始加载
+        loadPlayerData();
     </script>
 </body>
 </html>
