@@ -45,115 +45,170 @@
         .chest img {
             width: 100px;
         }
+        #music-control {
+            margin: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: rgba(255, 255, 255, 0.2);
+            border: 2px solid #fff;
+            border-radius: 5px;
+            color: #fff;
+            transition: background-color 0.3s;
+        }
+        #music-control:hover {
+            background-color: rgba(255, 255, 255, 0.4);
+        }
     </style>
 </head>
 <body>
-    <h1>欢迎来到寻宝游戏!</h1>
-    <div id="message">准备开始...</div>
-    <div id="chest-container" style="display:none;">
-        <h2>选择一个宝箱:</h2>
-        <div class="chest" onclick="selectChest(1)">
-            <img src="chest.png" alt="宝箱1" id="chest">
-        </div>
-        <div class="chest" onclick="selectChest(2)">
-            <img src="chest.png" alt="宝箱2" id="chest">
-        </div>
-        <div class="chest" onclick="selectChest(3)">
-            <img src="chest.png" alt="宝箱3" id="chest">
-        </div>
+<h1>欢迎来到寻宝游戏!</h1>
+<audio id="background-music" autoplay loop>
+    <source src="background-music.mp3" type="audio/mpeg">
+    您的浏览器不支持 audio 元素。
+</audio>
+<button id="music-control" onclick="toggleMusic()">播放/暂停音乐</button>
+<div id="message">准备开始...</div>
+<div id="chest-container" style="display:none;">
+    <h2>选择一个宝箱:</h2>
+    <div class="chest" onclick="selectChest(1)">
+        <img src="chest.png" alt="宝箱1" id="chest1">
     </div>
-    <script>
-        class TreasureMap {
-            static getInitialClue() {
-                return new Promise((resolve) => {
-                    setTimeout(() => {
-                        resolve("在古老的图书馆里找到了一个神秘的书籍...");
-                    }, 1000);
-                });
-            }
+    <div class="chest" onclick="selectChest(2)">
+        <img src="chest.png" alt="宝箱2" id="chest2">
+    </div>
+    <div class="chest" onclick="selectChest(3)">
+        <img src="chest.png" alt="宝箱3" id="chest3">
+    </div>
+</div>
+<script>
+    var musicIsPlaying = true;
 
-            static decodeAncientScript(clue) {
-                return new Promise((resolve, reject) => {
-                    setTimeout(() => {
-                        if (!clue) {
-                            reject("没有线索可以解码!");
-                        }
-                        resolve("解码成功! 你发现了一个古老的咒语...");
-                    }, 1500);
-                });
-            }
+    function toggleMusic() {
+        var music = document.getElementById('background-music');
+        if (musicIsPlaying) {
+            music.pause();
+            document.getElementById('music-control').textContent = '播放音乐';
+        } else {
+            music.play();
+            document.getElementById('music-control').textContent = '暂停音乐';
+        }
+        musicIsPlaying = !musicIsPlaying;
+    }
 
-            static searchTemple(location) {
-                return new Promise((resolve, reject) => {
-                    setTimeout(() => {
-                        const random = Math.random();
-                        if (random < 0.5) {
-                            reject("糟糕! 遇到了神庙的守护者! 你需要回答一个问题才能继续...");
-                        }
-                        resolve("找到了一个神秘的箱子...");
-                    }, 2000);
-                });
-            }
-
-            static openTreasureBox() {
-                return new Promise((resolve) => {
-                    setTimeout(() => {
-                        resolve("恭喜! 你找到了传说中的宝藏和一个神秘的卷轴!");
-                    }, 1000);
-                });
-            }
+    class TreasureMap {
+        static getInitialClue() {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    resolve("在古老的图书馆里找到了一个神秘的书籍...");
+                }, 1000);
+            });
         }
 
-        async function findTreasureWithAsyncAwait() {
-            const messageElement = document.getElementById('message');
-            try {
-                let clue = await TreasureMap.getInitialClue();
-                displayMessage(clue);
-
-                let script = await TreasureMap.decodeAncientScript(clue);
-                displayMessage(script);
-
-                let box = await TreasureMap.searchTemple(script);
-                displayMessage(box);
-
-                let treasure = await TreasureMap.openTreasureBox();
-                displayMessage(treasure);
-
-                // 显示宝箱选择
-                document.getElementById('chest-container').style.display = 'block';
-
-            } catch (error) {
-                displayMessage("任务失败: " + error);
-            }
+        static decodeAncientScript(clue) {
+            return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    if (!clue) {
+                        reject("没有线索可以解码!");
+                    }
+                    resolve("解码成功! 你发现了一个古老的咒语...");
+                }, 1500);
+            });
         }
 
-        function displayMessage(message) {
-            const messageElement = document.getElementById('message');
-            const icon = '🔍'; // 使用一个简单的图标（可以替换为图像）
-            messageElement.textContent += '\n' + icon + ' ' + message;
-            messageElement.classList.add('fade-in'); // 添加淡入效果
-            setTimeout(() => messageElement.classList.remove('fade-in'), 500); // 移除类以便下次使用
+        static searchTemple(location) {
+            return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    const random = Math.random();
+                    if (random < 0.1) {
+                        reject("糟糕! 遇到了神庙的守护者! 你需要回答一个问题才能继续...");
+                    }
+                    resolve("找到了一个神秘的箱子...");
+                }, 2000);
+            });
         }
 
-        function selectChest(chestNumber) {
-            const correctChests = [1, 2]; // 假设宝箱1和宝箱2是正确的
-            const chestImages = {
-                1: ['chest.png', 'treasure.png'], // 宝箱1的图片和打开后的图片
-                2: ['chest.png', 'treasure.png'], // 宝箱2的图片和打开后的图片
-                3: ['chest.png', 'empty.png'] // 宝箱3的图片和打开后的图片（空的）
-            };
-
-            const chestImage = document.getElementById(`chest${chestNumber}`);
-            chestImage.src = chestImages[chestNumber][1]; // 改变为打开后的图片
-
-            if (correctChests.includes(chestNumber)) {
-                alert("恭喜你！你选择了正确的宝箱！");
-            } else {
-                alert("很遗憾，你选择了错误的宝箱。");
-            }
+        static openTreasureBox() {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    resolve("恭喜! 你找到了传说中的宝藏和一个神秘的卷轴!");
+                }, 1000);
+            });
         }
+    }
 
-        findTreasureWithAsyncAwait();
-    </script>
+    async function findTreasureWithAsyncAwait() {
+        const messageElement = document.getElementById('message');
+        try {
+            let clue = await TreasureMap.getInitialClue();
+            displayMessage(clue);
+
+            let script = await TreasureMap.decodeAncientScript(clue);
+            displayMessage(script);
+
+            let box = await TreasureMap.searchTemple(script);
+            displayMessage(box);
+
+            let treasure = await TreasureMap.openTreasureBox();
+            displayMessage(treasure);
+
+            // 显示宝箱选择
+            document.getElementById('chest-container').style.display = 'block';
+
+            // 存储游戏历史
+            storeGameHistory('找到了传说中的宝藏和一个神秘的卷轴!');
+
+        } catch (error) {
+            displayMessage("任务失败: " + error);
+        }
+    }
+
+    function displayMessage(message) {
+        const messageElement = document.getElementById('message');
+        const icon = '🔍'; // 使用一个简单的图标（可以替换为图像）
+        messageElement.textContent += '\n' + icon + ' ' + message;
+        messageElement.classList.add('fade-in'); // 添加淡入效果
+        setTimeout(() => messageElement.classList.remove('fade-in'), 500); // 移除类以便下次使用
+    }
+
+    function selectChest(chestNumber) {
+        const correctChests = [1, 2]; // 假设宝箱1和宝箱2是正确的
+        const chestImages = {
+            1: ['chest.png', 'treasure.png'], // 宝箱1的图片和打开后的图片
+            2: ['chest.png', 'treasure.png'], // 宝箱2的图片和打开后的图片
+            3: ['chest.png', 'empty.png'] // 宝箱3的图片和打开后的图片（空的）
+        };
+
+        const chestImage = document.getElementById(`chest${chestNumber}`);
+        chestImage.src = chestImages[chestNumber][1]; // 改变为打开后的图片
+
+        if (correctChests.includes(chestNumber)) {
+            alert("恭喜你！你选择了正确的宝箱！");
+        } else {
+            alert("很遗憾，你选择了错误的宝箱。");
+        }
+    }
+
+    // 存储游戏历史
+    function storeGameHistory(history) {
+        let gameHistory = localStorage.getItem('gameHistory') ? JSON.parse(localStorage.getItem('gameHistory')) : [];
+        gameHistory.push(history);
+        localStorage.setItem('gameHistory', JSON.stringify(gameHistory));
+    }
+
+    // 恢复游戏历史
+    function restoreGameHistory() {
+        const gameHistory = localStorage.getItem('gameHistory') ? JSON.parse(localStorage.getItem('gameHistory')) : [];
+        if (gameHistory.length > 0) {
+            displayMessage(gameHistory[gameHistory.length - 1]); // 显示最后一条游戏历史
+        }
+    }
+
+    // 在页面加载时恢复游戏历史
+    restoreGameHistory();
+
+    // 开始游戏
+    findTreasureWithAsyncAwait();
+</script>
 </body>
 </html>
